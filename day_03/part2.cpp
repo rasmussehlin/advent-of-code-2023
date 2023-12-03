@@ -2,28 +2,23 @@
 #include <fstream>
 #include <string>
 #include <vector>
-// #include <boost/multiprecision/cpp_int.hpp>
-// using namespace boost::multiprecision;
 using namespace std;
 
-// int128_t getGearRatiosFromLine(vector<string> lines, int i);
 int getGearRatiosFromLine(vector<string> lines, int i);
 int getGearsRatio(vector<string> lines, int y, int x);
 
 int main()
 {
-    // Code goes here
     ifstream myfile;
-    myfile.open("input");
-    string line;
-    int gearRatios = 0;
     vector<string> lines;
+    string line;
+    myfile.open("input");
 
-    lines.push_back(string(142, '.'));
-    cout << "Let's go" << '\n';
+    int gearRatios = 0;
+    lines.push_back(string(142, '.')); // to not have to deal with boundary checking
+
     if (myfile.is_open())
     {
-        cout << "File is open" << '\n';
         while (getline(myfile, line))
         {
             if (line.compare("") != 0)
@@ -32,12 +27,9 @@ int main()
             }
         }
 
-        lines.push_back(string(142, '.'));
+        lines.push_back(string(142, '.')); // boundary checking fix
 
-        cout << "lines size: " << int(lines.size()) << '\n';
-
-        int upperBound = int(lines.size());
-        for (int i = 1; i < upperBound - 1; i++)
+        for (int i = 1; i < int(lines.size()) - 1; i++)
         {
             gearRatios += getGearRatiosFromLine(lines, i);
         }
@@ -53,16 +45,10 @@ int main()
 
 int getGearRatiosFromLine(vector<string> lines, int i)
 {
-    int sumGearRatios = 0;
     string currLine = lines[i];
-    int currLineBound = currLine.length();
+    int sumGearRatios = 0;
 
-    // cout.width(3);
-    // cout.fill('0');
-    // cout << right << (i + 1);
-    // cout << ": .";
-
-    for (int j = 1; j < currLineBound - 1; j++)
+    for (int j = 1; j < currLine.length() - 1; j++)
     {
         char symbol = currLine[j];
         if (symbol == '*')
@@ -72,16 +58,16 @@ int getGearRatiosFromLine(vector<string> lines, int i)
     }
 
     cout << "Sum of Line " << i << " :" << sumGearRatios << '\n';
-
     return sumGearRatios;
 }
 
 int getGearsRatio(vector<string> lines, int y, int x)
 {
     vector<string> mask(3, "_______");
-    mask[1][3] = '*';
+    mask[1][3] = '*'; // for printing
     int gearRatio = 1;
     int numberCount = 0;
+
     auto getFullNumber = [&](int j, int i)
     {
         string currentLine = lines[y + j];
@@ -90,14 +76,9 @@ int getGearsRatio(vector<string> lines, int y, int x)
         bool leftDone = false;
         bool rightDone = false;
         int offset = 1;
-        if (y + j == 133) {
-            cout << "133\n";
-        }
+
         auto checkOffset = [&](int offset_param) {
             char tmpChar = currentLine[x + i + offset_param];
-            // cout << "Looking at char at " << (i + offset_param) << ": " << tmpChar;
-            // cout.width(10);
-            // cout.fill(' ');
             if (isdigit(tmpChar))
             {
                 number = offset_param < 0 ? tmpChar + number : number + tmpChar;
@@ -105,18 +86,11 @@ int getGearsRatio(vector<string> lines, int y, int x)
             }
             else
             {
-                if (offset_param < 0)
-                {
-                    leftDone = true;
-                }
-                else
-                {
-                    rightDone = true;
-                }
+                if (offset_param < 0) { leftDone = true; } else { rightDone = true; }
             }
         };
 
-        while (offset < 3 && (not leftDone || not rightDone))
+        while (not leftDone || not rightDone)
         {
             if ((not leftDone && mask[j + 1][(i + 1) + 2 - offset] == 'x') ||
                 (not rightDone && mask[j + 1][(i + 1) + 2 + offset] == 'x'))
@@ -125,11 +99,10 @@ int getGearsRatio(vector<string> lines, int y, int x)
                 break;
             }
 
-            if (not leftDone) { checkOffset(-offset); /* cout << right << number << "L\n"; */}
-            if (not rightDone) { checkOffset(offset); /* cout << right << number << "R\n"; */}
+            if (not leftDone) { checkOffset(-offset); }
+            if (not rightDone) { checkOffset(offset); }
             offset++;
         }
-        // cout << "getFullNumber done: " << number << '\n';
 
         if (not alreadyCounted) { numberCount++; }
 
@@ -145,7 +118,6 @@ int getGearsRatio(vector<string> lines, int y, int x)
             {
                 mask[j + 1][i + 1 + 2] = 'x';
                 int fullNumber = getFullNumber(j, i);
-                // cout << "Fullnumber: " << fullNumber << '\n';
                 gearRatio *= fullNumber;
             }
         }
@@ -160,7 +132,6 @@ int getGearsRatio(vector<string> lines, int y, int x)
         }
         cout << '\n';
     }
-    cout << '\n';
     cout << "Gear ratio: " << gearRatio << ", numberCount: " << numberCount << '\n';
     return numberCount == 2 ? gearRatio : 0;
 }
