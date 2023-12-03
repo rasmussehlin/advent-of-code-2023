@@ -33,3 +33,5 @@
 
 # My own
 *.dSym
+.vscode/settings*
+.DS_Store
