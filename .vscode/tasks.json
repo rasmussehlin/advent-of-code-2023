@@ -10,7 +10,8 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-I", "/Users/rasmus/Dokument/boost_1_82_0"
             ],
             "options": {
                 "cwd": "${fileDirname}"
