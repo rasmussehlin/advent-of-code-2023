@@ -92,6 +92,11 @@ namespace AoCUtil
         {
             int nextIndex = inString.find(searchFor, currentIndex);
 
+            if (nextIndex == std::string::npos)
+            {
+                nextIndex = currentIndex;
+            }
+
             while (inString[nextIndex] == searchFor && nextIndex < inString.length())
             {
                 nextIndex++;
