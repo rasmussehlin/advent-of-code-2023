@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         vector<vector<int>> bounds(races, vector<int>(2,0));
         for (int i = 0; i < races; i++)
         {
-            boost::uint64_t raceTime = stoi(times[i]);
+            boost::uint64_t raceTime = std::stoi(times[i]);
             boost::uint64_t raceDistance = std::stoull(distances[i]);
             calculateBounds(i, raceTime, raceDistance, bounds);
         }
