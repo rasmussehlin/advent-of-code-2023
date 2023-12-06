@@ -6,6 +6,15 @@
 namespace AoCUtil
 {
     /**
+     * @brief "Private" functions declarations.
+     */
+    namespace
+    {
+        int getNextIndex(char searchFor, std::string inString, int currentIndex);
+        int getNextIndexDifferentThan(char searchFor, std::string inString, int currentIndex);
+    }
+
+    /**
      * @brief Split a string into a vector array.
      * 
      * @param delimmiter the character to split at (gets removed)
@@ -13,33 +22,28 @@ namespace AoCUtil
      * @param consecutiveAsOne count consecutive delimmiters as one
      * @return vector<string> an array containing the substrings of `toSplit`
      */
-    vector<std::string> split(char delimmiter, string toSplit, bool consecutiveAsOne)
+    std::vector<std::string> split(char delimmiter, std::string toSplit, bool consecutiveAsOne)
     {
-        vector<string> result;
+        std::vector<std::string> result;
         int currentIndex = 0;
         int nextIndex;
-        if (consecutiveAsOne)
-        {
-             nextIndex = getNextIndexDifferentThan(delimmiter, toSplit, currentIndex);
-        }
-        else
-        {
-            nextIndex = toSplit.find(delimmiter, currentIndex);
-        }
+        nextIndex = toSplit.find(delimmiter, currentIndex);
 
         while (currentIndex < toSplit.length())
         {
             result.push_back(toSplit.substr(currentIndex, nextIndex - currentIndex));
-            currentIndex = nextIndex + 1;
+            
             if (consecutiveAsOne)
             {
-                nextIndex = getNextIndexDifferentThan(delimmiter, toSplit, currentIndex);
+                currentIndex = getNextIndexDifferentThan(delimmiter, toSplit, nextIndex + 1);
             }
-            else 
+            else
             {
-                nextIndex = toSplit.find(delimmiter, currentIndex);
+                currentIndex = nextIndex + 1;
             }
-            if (nextIndex == string::npos)
+
+            nextIndex = toSplit.find(delimmiter, currentIndex);
+            if (nextIndex == std::string::npos)
             {
                 nextIndex = toSplit.length();
             }
@@ -50,7 +54,8 @@ namespace AoCUtil
     /**
      * @brief "Private" functions
      */
-    namespace {
+    namespace
+    {
         /**
          * @brief Get the next index in `inString` which is not `searchFor`
          * 
@@ -59,7 +64,7 @@ namespace AoCUtil
          * @param currentIndex index to search from (inclusive)
          * @return int the next index which isn't `searchFor`
          */
-        int getNextIndexDifferentThan(char searchFor, string inString, int currentIndex)
+        int getNextIndexDifferentThan(char searchFor, std::string inString, int currentIndex)
         {
             int nextIndex = inString.find(searchFor, currentIndex);
 
@@ -71,4 +76,4 @@ namespace AoCUtil
             return nextIndex;
         }
     }
-};
+}
