@@ -52,6 +52,30 @@ namespace AoCUtil
     }
 
     /**
+     * @brief Remove alla occurences of char in string. Returns a new string.
+     * 
+     * @param toRemove char to be removed
+     * @param inString string to remove from
+     * @return string resulting new string
+     */
+    std::string removeAll(char toRemove, std::string inString)
+    {
+        // Thanks: https://stackoverflow.com/a/20326454
+        std::string result;
+        result.reserve(inString.length());
+        
+        for (int i = 0; i < inString.length(); i++)
+        {
+            if (inString[i] != toRemove)
+            {
+                result += inString[i];
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * @brief "Private" functions
      */
     namespace
