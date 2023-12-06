@@ -35,7 +35,7 @@ namespace AoCUtil
             
             if (consecutiveAsOne)
             {
-                currentIndex = getNextIndexDifferentThan(delimmiter, toSplit, nextIndex + 1);
+                currentIndex = getNextIndexDifferentThan(delimmiter, toSplit, nextIndex);
             }
             else
             {
