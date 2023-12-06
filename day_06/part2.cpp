@@ -2,9 +2,10 @@
 #include <fstream>
 #include <string>
 #include "../AoCUtil.cpp"
+#include <boost/cstdint.hpp>
 using namespace std;
 
-void calculateBounds(int raceIndex, int totalTime, int minimumDistance, vector<vector<int>>& bounds);
+void calculateBounds(int raceIndex, boost::uint64_t totalTime, boost::uint64_t minimumDistance, vector<vector<int>>& bounds);
 
 int main(int argc, char *argv[])
 {
@@ -23,18 +24,20 @@ int main(int argc, char *argv[])
     if (myfile.is_open())
     {
         getline(myfile, line);
-        vector<string> times = AoCUtil::split(' ', line, true);
+        line = AoCUtil::removeAll(' ', line);
+        vector<string> times = AoCUtil::split(':', line, true);
         times.erase(times.begin());
         getline(myfile, line);
-        vector<string> distances = AoCUtil::split(' ', line, true);
+        line = AoCUtil::removeAll(' ', line);
+        vector<string> distances = AoCUtil::split(':', line, true);
         distances.erase(distances.begin());
 
         int races = times.size();
         vector<vector<int>> bounds(races, vector<int>(2,0));
         for (int i = 0; i < races; i++)
         {
-            int raceTime = stoi(times[i]);
-            int raceDistance = stoi(distances[i]);
+            boost::uint64_t raceTime = stoi(times[i]);
+            boost::uint64_t raceDistance = std::stoull(distances[i]);
             calculateBounds(i, raceTime, raceDistance, bounds);
         }
 
@@ -53,31 +56,29 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void calculateBounds(int raceIndex, int totalTime, int minimumDistance, vector<vector<int>>& bounds)
+void calculateBounds(int raceIndex, boost::uint64_t totalTime, boost::uint64_t minimumDistance, vector<vector<int>>& bounds)
 {
-    int tempDistance;
+    boost::uint64_t tempDistance;
     for (int i = 1; i < totalTime; i++)
     {
-        // distance = timeLeft * speed
-        // timeLeft = totalTime - timePassed
-        // speed = timePassed
-        // timePassed = totalTime - timeLeft
-
-        // distance = (totalTime - timePassed) * (totalTime - timeLeft)
-        // distance = (totalTime - timePassed) * (totalTime - (totalTime - timePassed))
-        // distance = (totalTime - timePassed) * timePassed
-        // distance = totalTime * timePassed - timePassed^2
-        tempDistance = totalTime * i - i * i;
         tempDistance = (totalTime - i) * i;
 
         if (tempDistance > minimumDistance && bounds[raceIndex][0] == 0)
         {
             bounds[raceIndex][0] = i;
-        }
-        else if (bounds[raceIndex][0] != 0 && tempDistance <= minimumDistance)
-        {
-            bounds[raceIndex][1] = i - 1;
             break;
         }
-    }   
+    }
+
+    for (int i = totalTime; i > 0; i--)
+    {
+        tempDistance = (totalTime - i) * i;
+        
+        if (tempDistance > minimumDistance)
+        {
+            bounds[raceIndex][1] = i;
+            break;
+        }
+    }
+    
 }

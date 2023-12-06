@@ -35,3 +35,4 @@
 *.dSym
 .vscode/settings*
 .DS_Store
+boost_installation.log
