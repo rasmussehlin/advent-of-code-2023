@@ -48,12 +48,11 @@ int main(int argc, char *argv[])
                 //     cout << "hopp";
                 // }
 
-                hand tmpHand;
-                tmpHand.cards = splitLine[0];
-                tmpHand.bet = stoi(splitLine[1]);
-                tmpHand.lineIndex = lineIndex;
+                hands.push_back(hand());
+                hands[lineIndex].cards = splitLine[0];
+                hands[lineIndex].bet = stoi(splitLine[1]);
+                hands[lineIndex].lineIndex = lineIndex;
                 lineIndex++;
-                hands.push_back(tmpHand);
             }
         }
 
@@ -91,8 +90,19 @@ bool handCompare(const hand &a, const hand &b)
 {
     if (a.cards.compare("") == 0)
     {
-        cout << "WRONG";
+        return true;
     }
+    else if (a.cards.compare("") == 0)
+    {
+        return false;
+    }
+
+    cout << "Comparing " << a.cards<<"("<< a.lineIndex<<")" << " against " << b.cards << "(" << b.lineIndex << ")\n";
+    if (a.cards.compare("AA2AA") == 0 && b.cards.compare("AQAAA") == 0)
+    {
+        cout << "Here we are";
+    }
+
     int aType = getHandsRank(a);
     int bType = getHandsRank(b);
 
