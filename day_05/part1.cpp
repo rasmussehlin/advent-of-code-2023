@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
     ifstream myfile;
     myfile.open(argv[1]);
     string line;
-    int sum = 0;
 
     if (myfile.is_open())
     {
@@ -32,43 +31,66 @@ int main(int argc, char *argv[])
             boost::uint64_t srcRangeStart;
             boost::uint64_t rangeLength;
         };
+
         vector<vector<santaMap>> maps;
+        int mapsSize = 0;
+        int mapsSantamapSize = 0;
 
         while (getline(myfile, line))
         {
             if (line.length() > 1 && isdigit(line[0]))
             {
                 vector<string> tmp = AoCUtil::split(' ', line, true);
-                santaMap tmpMap;
+
+                maps[mapsSize - 1].push_back(santaMap());
+                mapsSantamapSize++;
+                santaMap &tmpMap = maps[mapsSize - 1][mapsSantamapSize - 1];
                 tmpMap.destRangeStart = stoull(tmp[0]);
                 tmpMap.srcRangeStart = stoull(tmp[1]);
                 tmpMap.rangeLength = stoull(tmp[2]);
-                maps[maps.size() - 1].push_back(tmpMap);
             }
             else if (line.length() > 1 && isalpha(line[0]))
             {
                 maps.push_back(vector<santaMap>());
+                mapsSize++;
+                mapsSantamapSize = 0;
             }
         }
 
+        // Convert seeds to integers
+        vector<boost::uint64_t> transformedSeeds;
         for (int i = 0; i < seeds.size(); i++)
         {
-            boost::uint64_t seed = stoull(seeds[i]);
+            transformedSeeds.push_back(stoull(seeds[i]));
+        }
+
+        // Translate seeds to location
+        for (int i = 0; i < seeds.size(); i++)
+        {
             int mapTypeIndex = 0;
+            bool transformedSeedChanged = false;
+            // Go through all maptypes and transform step by step
             while (mapTypeIndex < maps.size())
             {
                 vector<santaMap> tmpMap = maps[mapTypeIndex];
-                for (int i = 0; i < tmpMap.size(); i++)
-                {
-                    
-                }
                 
+                // Find the one map for this maptype that fits
+                for (int j = 0; j < tmpMap.size(); j++)
+                {
+                    if (transformedSeeds[i] >= tmpMap[j].srcRangeStart && 
+                        transformedSeeds[i] < tmpMap[j].srcRangeStart + tmpMap[j].rangeLength)
+                    {
+                        transformedSeeds[i] = tmpMap[j].destRangeStart + transformedSeeds[i] - tmpMap[j].srcRangeStart;
+                        break;
+                    }
+                }
+
+                mapTypeIndex++;
             }
         }
-    }
 
-    cout << sum;
-    cout << '\n';
+        std::cout << to_string(*min_element(transformedSeeds.begin(), transformedSeeds.end())) << std::endl;
+    }
 
     myfile.close();
 
