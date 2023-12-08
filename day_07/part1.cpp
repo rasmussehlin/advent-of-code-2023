@@ -2,37 +2,42 @@
 #include <fstream>
 #include <string>
 #include "../AoCUtil.cpp"
-#include <chrono>
-#include <thread>
+#include <algorithm>
 
-using namespace std;
+#define PRINT(a) std::cout << a << std::endl;
 
-struct hand
+struct Hand
 {
-    string cards;
+    Hand(std::string cards, int bet, int lineIndex)
+    {
+        this->cards = cards;
+        this->bet = bet;
+        this->lineIndex = lineIndex;
+    };
+    std::string cards;
     int bet;
     int lineIndex;
 };
 // returns ​true if the first argument is less than (i.e. is ordered before) the second. // cpp reference
-bool handCompare(const hand &a, const hand &b);
-bool cardsCompare(const string &a, const string &b);
-int getHandsRank(const hand &h);
+bool handCompare(const Hand &a, const Hand &b);
+bool cardsCompare(const std::string &a, const std::string &b);
+int getHandsRank(const Hand &h);
 
 int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        cout << "Needs to be exactly one argument. Exiting...\n";
+        std::cout << "Needs to be exactly one argument. Exiting...\n";
         return 0;
     }
 
     // Code goes here
-    ifstream myfile;
+    std::ifstream myfile;
     myfile.open(argv[1]);
-    string line;
+    std::string line;
     int sum = 0;
 
-    vector<hand> hands;
+    std::vector<Hand> hands;
     int lineIndex = 0;
 
     if (myfile.is_open())
@@ -41,18 +46,14 @@ int main(int argc, char *argv[])
         {
             if (line.length() > 2)
             {
-                vector<string> splitLine = AoCUtil::split(' ', line, true);
-                // cout << splitLine[0] << splitLine[1];
-                // if (splitLine[0].compare("") == 0)
-                // {
-                //     cout << "hopp";
-                // }
-
-                hands.push_back(hand());
-                hands[lineIndex].cards = splitLine[0];
-                hands[lineIndex].bet = stoi(splitLine[1]);
-                hands[lineIndex].lineIndex = lineIndex;
+                std::vector<std::string> splitLine = AoCUtil::split(' ', line, true);
+                hands.push_back(Hand(splitLine[0], stoi(splitLine[1]), lineIndex));
                 lineIndex++;
+                PRINT(lineIndex);
+            }
+            if (lineIndex == 1000)
+            {
+                PRINT("DUDE");
             }
         }
 
@@ -70,6 +71,16 @@ int main(int argc, char *argv[])
         //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
         // }
         
+        for (int i = 0; i < hands.size(); i++)
+        {
+            if (hands[i].cards.empty())
+            {
+                PRINT("Is empty");
+            }
+        }
+
+        PRINT("KLART");
+
         std::sort(hands.begin(), hands.end(), handCompare);
 
         for (int i = 0; i < hands.size(); i++)
@@ -78,34 +89,26 @@ int main(int argc, char *argv[])
         }
     }
 
-    cout << sum;
-    cout << '\n';
+    std::cout << sum;
+    std::cout << '\n';
 
     myfile.close();
 
     return 0;
 }
 
-bool handCompare(const hand &a, const hand &b)
+bool handCompare(const Hand &a, const Hand &b)
 {
-    if (a.cards.compare("") == 0)
+    if (a.cards.empty())
     {
-        return true;
+        PRINT("IS empty");
     }
-    else if (a.cards.compare("") == 0)
+    else
     {
-        return false;
+        PRINT("NOT EMTPY");
     }
-
-    cout << "Comparing " << a.cards<<"("<< a.lineIndex<<")" << " against " << b.cards << "(" << b.lineIndex << ")\n";
-    if (a.cards.compare("AA2AA") == 0 && b.cards.compare("AQAAA") == 0)
-    {
-        cout << "Here we are";
-    }
-
     int aType = getHandsRank(a);
     int bType = getHandsRank(b);
-
 
     if (aType < bType)
     {
@@ -121,14 +124,15 @@ bool handCompare(const hand &a, const hand &b)
     }
 }
 
-bool cardsCompare(const string &a, const string &b)
+bool cardsCompare(const std::string &a, const std::string &b)
 {
     if (a.length() != b.length())
     {
-        throw std::invalid_argument("Cards `a` and `b` aren't the same length.");
+        return false;
+        // throw std::invalid_argument("Cards `a` and `b` aren't the same length.");
     }
 
-    string rank = "23456789TJQKA";
+    std::string rank = "23456789TJQKA";
 
     for (int i = 0; i < a.length(); i++)
     {
@@ -149,16 +153,16 @@ bool cardsCompare(const string &a, const string &b)
     return true;
 }
 
-int getHandsRank(const hand &h)
+int getHandsRank(const Hand &h) 
 {
-    string cards = h.cards;
+    std::string cards = h.cards;
     std::sort(cards.begin(), cards.end());
-    string uniques = "";
+    std::string uniques = "";
     int maxCount = 0;
     int currCount = 1;
     for (int i = 0; i < cards.length(); i++)
     {
-        if (uniques.find(cards[i]) == string::npos)
+        if (uniques.find(cards[i]) == std::string::npos)
         {
             uniques += cards[i];
             if (currCount > maxCount)
@@ -181,17 +185,18 @@ int getHandsRank(const hand &h)
 
     switch (uniques.length())
     {
-        case 1:
-            return 6;
-        case 2:
-            return (maxCount == 4) ? 5 : 4;
-        case 3:
-            return (maxCount == 3) ? 3 : 2;
-        case 4:
-            return 1;
-        case 5:
-            return 0;
-        default:
-            throw std::invalid_argument("uniques.length() was \"" + to_string(uniques.length()) + "\", invalid arguments.");
+    case 1:
+        return 6;
+    case 2:
+        return (maxCount == 4) ? 5 : 4;
+    case 3:
+        return (maxCount == 3) ? 3 : 2;
+    case 4:
+        return 1;
+    case 5:
+        return 0;
+    default:
+        return -1;
+        // throw std::invalid_argument("uniques.length() was \"" + to_string(uniques.length()) + "\", invalid arguments.");
     }
 }
