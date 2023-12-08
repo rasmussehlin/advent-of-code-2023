@@ -3,6 +3,7 @@
 #include <string>
 #include "../AoCUtil.cpp"
 #include <boost/cstdint.hpp>
+#include <boost/integer/common_factor.hpp>
 
 int main(int argc, char *argv[])
 {
@@ -42,12 +43,7 @@ int main(int argc, char *argv[])
 
         nodes = std::vector<std::vector<int>>(stringNodes.size(), std::vector<int>(3, -1));
 
-        // Make sure it looks good.
-        // for (int i = 0; i < stringNodes.size(); i++)
-        // {
-        //     cout << stringNodes[i][0] << ":" << stringNodes[i][1] << ":" << stringNodes[i][2] << '\n';
-        // }
-
+        // Reformat to a tree structure (kind of)
         for (int i = 0; i < stringNodes.size(); i++)
         {
             if (stringNodes[i][0][2] == 'A')
@@ -81,32 +77,16 @@ int main(int argc, char *argv[])
             
         }
 
-        // Control result visualy.
-        // for (int i = 0; i < nodes.size(); i++)
-        // {
-        //     if (nodes[i][0] == -1 || nodes[i][1] == -1 || nodes[i][2] == -1)
-        //     {
-        //         std::cout << nodes[i][0] << ":" << nodes[i][1] << ":" << nodes[i][2] << '\n';
-        //     }
-        // }
-        // std::cout << "nope";
-
-
+        // Take steps
         int instructionIndex = 0;
         bool foundZZZ = false;
         boost::int64_t stepsTaken = 0;
 
-        std::cout << "Starting positions:\n";
-        for (int i = 0; i < startingPositions.size(); i++)
-        {
-            std::cout << startingPositions[i] << ", ";
-        }
-        std::cout << '\n';
+        std::vector<boost::uint64_t> cycles = std::vector<boost::uint64_t>(startingPositions.size(), -1);
+        int cyclesFound = 0;
 
-        while (not foundZZZ)
+        while (cyclesFound < cycles.size())
         {
-            // std::string current = stringNodes[currentNode][0];
-
             if (instructionIndex == instructions.length())
             {
                 instructionIndex = 0;
@@ -117,38 +97,30 @@ int main(int argc, char *argv[])
             {
                 startingPositions[i] = instruction == 'L' ? nodes[startingPositions[i]][1] : nodes[startingPositions[i]][2];
             }
-            
-            // currentNode = instructions[instructionIndex] == 'L' ? nodes[currentNode][1] : nodes[currentNode][2];
-            // stepsTaken += startingPositions.size();
+
             stepsTaken++;
             instructionIndex++;
 
-            if (stepsTaken < 5) 
-            {
-                std::cout << "Overflow? Stepstaken = " << stepsTaken;
-            }
-
-            foundZZZ = true;
+            // Find first time reaching "**z" for each starting position
             for (int i = 0; i < startingPositions.size(); i++)
             {
-                if (stringNodes[startingPositions[i]][0][2] != 'Z')
+                if (stringNodes[startingPositions[i]][0][2] == 'Z' && cycles[i] == -1)
                 {
-                    foundZZZ = false;
-                    break;
+                    cycles[i] = stepsTaken;
+                    cyclesFound++;
                 }
             }
-            
-            // if (stringNodes[currentNode][0].compare("ZZZ") == 0)
-            // {
-            //     foundZZZ = true;
-            // }
         }
 
-        std::cout << "Steps taken: " << stepsTaken << '\n';
-    }
+        // Calculate LCM
+        boost::uint64_t result = boost::integer::lcm(cycles[0], cycles[1]);
+        for (int i = 2; i < cycles.size(); i++)
+        {
+            result = boost::integer::lcm(result, cycles[i]);
+        }
 
-    // std::cout << sum;
-    // std::cout << '\n';
+        std::cout << "Steps needed to take: " << result << std::endl;
+    }
 
     myfile.close();
 
