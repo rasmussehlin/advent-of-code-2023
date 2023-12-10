@@ -3,20 +3,21 @@
 #include <string>
 #include "../AoCUtil.cpp"
 #include <boost/cstdint.hpp>
-using namespace std;
+
+#define PRINT(a) std::cout << a << std::endl;
 
 int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        cout << "Needs to be exactly one argument. Exiting...\n";
+        PRINT("Needs to be exactly one argument. Exiting...\n");
         return 0;
     }
 
     // Code goes here
-    ifstream myfile;
+    std::ifstream myfile;
     myfile.open(argv[1]);
-    string line;
+    std::string line;
     int sum = 0;
 
     if (myfile.is_open())
@@ -27,8 +28,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    cout << sum;
-    cout << '\n';
+    PRINT(sum);
+    PRINT('\n');
 
     myfile.close();
 
