@@ -1,8 +1,59 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "../AoCUtil.cpp"
+#include <chrono>
+#include <thread>
+#include <vector>
+#include <cmath>
 #include <algorithm>
+
+using namespace std;
+
+int getNextIndexDifferentThan(char searchFor, std::string inString, int currentIndex)
+{
+    int nextIndex = inString.find(searchFor, currentIndex);
+
+    if (nextIndex == std::string::npos)
+    {
+        nextIndex = currentIndex;
+    }
+
+    while (inString[nextIndex] == searchFor && nextIndex < inString.length())
+    {
+        nextIndex++;
+    }
+
+    return nextIndex;
+}
+
+std::vector<std::string> split(char delimmiter, std::string toSplit, bool consecutiveAsOne)
+{
+    std::vector<std::string> result;
+    int currentIndex = 0;
+    int nextIndex;
+    nextIndex = toSplit.find(delimmiter, currentIndex);
+
+    while (currentIndex < toSplit.length())
+    {
+        result.push_back(toSplit.substr(currentIndex, nextIndex - currentIndex));
+        
+        if (consecutiveAsOne)
+        {
+            currentIndex = getNextIndexDifferentThan(delimmiter, toSplit, nextIndex);
+        }
+        else
+        {
+            currentIndex = nextIndex + 1;
+        }
+
+        nextIndex = toSplit.find(delimmiter, currentIndex);
+        if (nextIndex == std::string::npos)
+        {
+            nextIndex = toSplit.length();
+        }
+    }
+    return result;
+}
 
 #define PRINT(a) std::cout << a << std::endl;
 
@@ -46,7 +97,7 @@ int main(int argc, char *argv[])
         {
             if (line.length() > 2)
             {
-                std::vector<std::string> splitLine = AoCUtil::split(' ', line, true);
+                std::vector<std::string> splitLine = split(' ', line, true);
                 hands.push_back(Hand(splitLine[0], stoi(splitLine[1]), lineIndex));
                 lineIndex++;
                 PRINT(lineIndex);
@@ -79,8 +130,6 @@ int main(int argc, char *argv[])
             }
         }
 
-        PRINT("KLART");
-
         std::sort(hands.begin(), hands.end(), handCompare);
 
         for (int i = 0; i < hands.size(); i++)
@@ -99,14 +148,6 @@ int main(int argc, char *argv[])
 
 bool handCompare(const Hand &a, const Hand &b)
 {
-    if (a.cards.empty())
-    {
-        PRINT("IS empty");
-    }
-    else
-    {
-        PRINT("NOT EMTPY");
-    }
     int aType = getHandsRank(a);
     int bType = getHandsRank(b);
 
@@ -129,7 +170,7 @@ bool cardsCompare(const std::string &a, const std::string &b)
     if (a.length() != b.length())
     {
         return false;
-        // throw std::invalid_argument("Cards `a` and `b` aren't the same length.");
+        // throw std::invalid_argument("Cards a and b aren't the same length.");
     }
 
     std::string rank = "23456789TJQKA";
